@@ -82,7 +82,7 @@ The `add-words.ts` script allows you to add new words to the database from a spe
 To run the add words script:
 
 ```
-tsx add-words.ts --file <path-to-json-file>
+tsx add-words.ts --file <path-to-json-file> --label "optional-label"
 ```
 
 The JSON file should contain an array of words to add. For example:
@@ -102,28 +102,8 @@ Example usage:
 tsx add-words.ts --file new-words.json
 ```
 
-### Check Grace Period Script
-
-The `check-grace-period.ts` script checks for updates on names that are in the grace period.
-
-To run the check grace period script:
-
-```
-tsx check-grace-period.ts
-```
-
-This script will:
-- Read the database and filter for names in the grace period
-- Check the current status of each of these names
-- Update the database with any changes in status or availability
-- Display the number of names updated
-
-Run this script periodically to keep your database up-to-date with the latest status of names in the grace period.
-
 ## Notes
 
 - The `add-words.ts` script is used to initially populate the database and add new words.
 - The `index.ts` script updates the `db.json` file with the latest ENS name information for existing entries.
-- Run `index.ts` periodically to keep your database up-to-date, especially for names nearing expiration.
 - The `report.ts` script reads from the `db.json` file to generate reports.
-- After adding new words with `add-words.ts`, run `index.ts` to check their ENS status.
