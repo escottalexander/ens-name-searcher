@@ -11,9 +11,6 @@ const db = new Low<DBHead>(adapter, {
   names: [],
 })
 
-// Load common names
-const commonNames = JSON.parse(fs.readFileSync('commonNames.json', 'utf8')).map(name => name.toLowerCase());
-
 async function main() {
   await db.read()
 
@@ -58,9 +55,13 @@ async function main() {
       type: 'number',
       default: 100,
     })
-    .option('commonNamesOnly', {
-      description: 'Only show names that are in commonNames.json',
-      type: 'boolean',
+    .option('label', {
+      description: 'Filter by label',
+      type: 'string',
+    })
+    .option('filterFile', {
+      description: 'JSON file containing an array of names to filter by',
+      type: 'string',
     })
     .help()
     .alias('help', 'h').argv
@@ -91,10 +92,24 @@ async function main() {
     filteredNames = filteredNames.filter((name) => name.name.replace('.eth', '').length <= (argv.maxLength as number))
   }
 
-  if (argv.commonNamesOnly) {
-    filteredNames = filteredNames.filter((name) => 
-      commonNames.includes(name.name.replace('.eth', '').toLowerCase())
-    )
+  if (argv.label) {
+    filteredNames = filteredNames.filter((name) => name.label === argv.label)
+  }
+
+  if (argv.filterFile) {
+    try {
+      const filterNames = JSON.parse(fs.readFileSync(argv.filterFile as string, 'utf8'));
+      if (Array.isArray(filterNames)) {
+        const filterSet = new Set(filterNames.map(name => name.toLowerCase()));
+        filteredNames = filteredNames.filter((name) => 
+          filterSet.has(name.name.replace('.eth', '').toLowerCase())
+        );
+      } else {
+        console.error('The filter file does not contain a valid array of names.');
+      }
+    } catch (error) {
+      console.error('Error reading or parsing the filter file:', error);
+    }
   }
 
   // Sort results
